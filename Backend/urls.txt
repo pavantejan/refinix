@@ -1,0 +1,6 @@
+code conversion = localhost:5000/codeconversion/convert-code/{source_language}/{target_langauge}
+
+code explanation = localhost:5000/codeexplanation
+
+
+
