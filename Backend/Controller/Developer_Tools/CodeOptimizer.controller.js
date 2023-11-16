@@ -1,7 +1,7 @@
 
-const { OPENAI_API_KEY } = require("../Constant");
-const codeOptimizerService = require("../Services/CodeOptimizer.service");
-const axios = require('axios');
+const codeOptimizerService = require("./../../Services/Developer_Tools/CodeOptimizer.service");
+
+
 const handleCodeOptimizer = async (req, res) => {
     try {
         const {code,source_language} = req.body;

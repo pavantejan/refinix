@@ -1,4 +1,4 @@
-const { getCodeExplanation } = require('../Services/CodeExplanation.service');
+const { getCodeExplanation } = require('./../../Services/Developer_Tools/CodeExplanation.service');
 
 const getExplanation = async (req, res) => {
     try {
@@ -24,5 +24,5 @@ const getExplanation = async (req, res) => {
 
 
 module.exports = {
-    getExplanation,
+    getExplanation
 };

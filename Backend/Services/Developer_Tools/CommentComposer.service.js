@@ -1,5 +1,5 @@
 // Import the OpenAI configuration
-const openaiconfig = require("../Config/open_ai");
+const openaiconfig = require("./../../Config/open_ai");
 
 // Define a service function for generate comments from source code 
 const CommentComposerService = (source_language, code) => {

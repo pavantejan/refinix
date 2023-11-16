@@ -1,5 +1,5 @@
 // Import the OpenAI configuration
-const openaiconfig = require("../Config/open_ai");
+const openaiconfig = require("./../../Config/open_ai");
 
 // Define a service function for code conversion
 const CodeConversionService = (from_language, to_language, code) => {
