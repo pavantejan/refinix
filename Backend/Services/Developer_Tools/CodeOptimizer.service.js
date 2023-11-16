@@ -1,4 +1,5 @@
-const openaiconfig = require("../Config/open_ai");
+// Import the OpenAI configuration
+const openaiconfig = require("./../../Config/open_ai");
 
 const codeOptimizerService=async (code, source_language)=>{
     return new Promise(async (resolve,reject)=>{

@@ -1,4 +1,4 @@
-const { CommentComposerService } = require("../Services/CommentComposer.service");
+const { CommentComposerService } = require("./../../Services/Developer_Tools/CommentComposer.service");
 
 // Define a controller function to generate comments
 const generateComments = async (req, res) => {

@@ -6,9 +6,7 @@ import Multiselect from "multiselect-react-dropdown";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-
-export const JobDescription = () => {
-
+export const InterviewAssistant = () => {
   // const currentSelectedRequirements;
 
   const [title, setTitle] = useState("");
@@ -27,6 +25,33 @@ export const JobDescription = () => {
   const [selectedBenefits, setSelectedBenefits] = useState([]);
 
   const [inputEnabled, setInputEnabled] = useState(false);
+
+  const [toggles, setToggles] = useState([
+    {
+      question: "Question 1",
+      buttonText: "Toggle 1",
+      divId: "toggle1",
+      isVisible: false,
+    },
+    {
+      question: "Question 2",
+      buttonText: "Toggle 2",
+      divId: "toggle2",
+      isVisible: false,
+    },
+    {
+      question: "Question 3",
+      buttonText: "Toggle 3",
+      divId: "toggle3",
+      isVisible: false,
+    },
+  ]);
+
+  const handleToggle = (index) => {
+    const updatedToggles = [...toggles];
+    updatedToggles[index].isVisible = !updatedToggles[index].isVisible;
+    setToggles(updatedToggles);
+  };
 
   const payLoad = {
     title: title,
@@ -111,124 +136,35 @@ export const JobDescription = () => {
     <>
       <Navbar />
       <div className="mt-10 flex flex-wrap justify-center items-center font-bold text-4xl p-10">
-        AI Job Description Generator
+        AI Interview Assistant
       </div>
 
-      <div className="flex flex-wrap justify-center font-bold gap-24 ">
+      <div className="flex flex-wrap justify-center font-bold gap-20 ">
         <div className="w-full max-w-lg px-4 py-4 mb-4 relative ">
-          <div className="inline-flex gap-10">
-            <div className="relative pb-3">
-              <input
-                type="text"
-                id="floating_title"
-                className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                placeholder=" "
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                }}
-              />
-              <label
-                htmlFor="floating_title"
-                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
-              >
-                Title
-              </label>
-            </div>
-
-            <div className="relative pb-3">
-              <input
-                type="text"
-                id="floating_department"
-                className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                placeholder=" "
-                onChange={(e) => {
-                  setDepartment(e.target.value);
-                }}
-              />
-              <label
-                htmlFor="floating_department"
-                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
-              >
-                Department
-              </label>
-            </div>
-          </div>
-
-          <div className="inline-flex gap-10">
-            <div className="relative pb-3">
-              <input
-                type="text"
-                id="floating_about_company"
-                className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                placeholder=" "
-                onChange={(e) => {
-                  setCompany(e.target.value);
-                }}
-              />
-              <label
-                htmlFor="floating_about_company"
-                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
-              >
-                About Company
-              </label>
-            </div>
-            <div className="relative pb-3">
-              <input
-                type="text"
-                id="floating_report_to"
-                className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                placeholder=" "
-                onChange={(e) => {
-                  setReportTo(e.target.value);
-                }}
-              />
-              <label
-                htmlFor="floating_report_to"
-                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
-              >
-                Report to
-              </label>
-            </div>
-          </div>
-
           <div className="relative pb-3">
-            <input
-              type="text"
-              id="floating_responsibility"
-              className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              onChange={(e) => {
-                setResponsibilities(e.target.value);
-              }}
-            />
-            <label
-              htmlFor="floating_responsibility"
-              className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
-            >
-              Responsibilities
-            </label>
-          </div>
-
-          <div className="py-3">
             <Multiselect
-              onSelect={handleSelect1}
-              onRemove={handleSelect1}
+              onSelect={handleSelect2}
+              onRemove={handleSelect2}
               className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               isObject={false}
               onKeyPressFn={function noRefCheck() {}}
               onSearch={function noRefCheck() {}}
               options={[
-                "Design",
-                "Development",
-                "Test software applications",
-                "Work with other engineers to implement new features and improve existing functionality",
+                "Behavioural Interview",
+                "Case Interview",
+                "Stress Interview",
+                "Competency Based Interview",
+                "Panel Interview",
+                "Group Interview",
+                "Informal Interview",
               ]}
-              placeholder="Choose Duties"
+              selectionLimit={1}
+              placeholder="Pick and interview type"
               style={{
                 searchBox: {
                   border: "none",
                   "border-bottom": "1px solid gray",
-                  "border-radius": "1px",
+                  // "border-radius": "1px",
                 },
               }}
             />
@@ -248,7 +184,8 @@ export const JobDescription = () => {
                 "Relational databases(e.g., MySQL, PostgreSQL)",
                 "Cloud computing platforms (e.g., AWS, Azure, GCP)",
               ]}
-              placeholder="Choose Qualifications"
+              selectionLimit={1}
+              placeholder="Pick an interview stage"
               style={{
                 searchBox: {
                   border: "none",
@@ -259,11 +196,11 @@ export const JobDescription = () => {
             />
           </div>
 
-          <div className="py-3 gap-10 inline-flex z-10">
+          <div className="py-3">
             <Multiselect
               onSelect={handleSelect3}
               onRemove={handleSelect3}
-              className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               isObject={false}
               onKeyPressFn={function noRefCheck() {}}
               onSearch={function noRefCheck() {}}
@@ -273,7 +210,8 @@ export const JobDescription = () => {
                 "Ability to work independently and as a part of a team",
                 "Ability to meet deadlines and work under pressure",
               ]}
-              placeholder="Choose Requirements"
+              selectionLimit={1}
+              placeholder="Who are you having interview with"
               style={{
                 searchBox: {
                   border: "none",
@@ -282,68 +220,21 @@ export const JobDescription = () => {
                 },
               }}
             />
-
-            <button
-              className="gap-1 text-gray-800  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              type="button"
-              onClick={handleClickAdd}
-            >
-              <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.546.5a9.5 9.5 0 1 0 9.5 9.5 9.51 9.51 0 0 0-9.5-9.5ZM13.788 11h-3.242v3.242a1 1 0 1 1-2 0V11H5.304a1 1 0 0 1 0-2h3.242V5.758a1 1 0 0 1 2 0V9h3.242a1 1 0 1 1 0 2Z" />
-              </svg>
-              <span>Add</span>
-            </button>
-          </div>
-
-          <div className="relative pb-3 z-0" hidden={!inputEnabled}>
-            <input
-              type="text"
-              id="floating_about_company"
-              className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              onChange={(e) => {
-                setMoreRequirements(e.target.value);
-              }}
-            />
-            <label
-              htmlFor="floating_about_company"
-              className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
-            >
-              Add more requirements
-            </label>
           </div>
 
           <div className="py-3">
-            <Multiselect
-              onSelect={handleSelect4}
-              onRemove={handleSelect4}
-              className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              isObject={false}
-              onKeyPressFn={function noRefCheck() {}}
-              onSearch={function noRefCheck() {}}
-              options={[
-                "Health insurance",
-                "Remote Work Facility",
-                "Paid Time Off",
-                "Paternity Leaves",
-                "Internet Allowance",
-                "Food Coupons"
-              ]}
-              placeholder="Choose Benefits"
-              style={{
-                searchBox: {
-                  border: "none",
-                  "border-bottom": "1px solid gray",
-                  "border-radius": "1px",
-                },
-              }}
-            />
+            <label
+              for="message"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Paste the job description below
+            </label>
+            <textarea
+              id="message"
+              rows="4"
+              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Write your thoughts here..."
+            ></textarea>
           </div>
 
           {/* <div className="pb-5 text-gray-600 font-bold">
@@ -450,14 +341,65 @@ export const JobDescription = () => {
                 </div>
               </div>
             ) : (
-              <textarea
-                id="message1"
-                rows="24"
-                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-black focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder=""
-                value={isLoading ? "" : finalResponse}
-                readOnly
-              ></textarea>
+              // <div className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              //   hi Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              //   <br />
+              //   <br />
+              //   <hr />
+              //   <br />
+              //   <button
+              //     type="button"
+              //     class="text-purple-700 bg-purple-300 hover:bg-purple-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-xl text-sm px-5 py-2.5 text-center mb-2 "
+              //   >
+              //     Answer
+              //   </button>
+              //   <div id="toggle" className="px-4 py-2.5">
+              //     <div className="block p-2.5 w-full text-sm text-gray-600 bg-gray-100 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              //       Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+              //       Quisquam saepe dignissimos, exercitationem ratione sit
+              //       labore, minima amet quod voluptas asperiores dolorem debitis
+              //       itaque ipsa. Deserunt nobis molestias voluptates fuga
+              //       debitis.
+              //     </div>
+              //   </div>
+              // </div>
+
+              <div>
+                {toggles.map((toggle, index) => (
+                  <div className="py-2.5" key={index}>
+                    <div className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <div className="pt-1 pb-2.5">
+                        Q{index + 1}. {toggle.question}
+                      </div>
+                      <hr />
+                      <div className="p-2.5">
+                        <button
+                          className="px-3 py-2.5 text-purple-700 bg-purple-300 hover:bg-purple-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-xl text-sm text-center mb-2"
+                          onClick={() => handleToggle(index)}
+                        >
+                          Answer
+                        </button>
+                      </div>
+                      {toggle.isVisible && (
+                        <div id={toggle.divId} className="px-6">
+                          <div className="block p-2.5 w-full text-sm text-gray-600 bg-gray-100 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            {toggle.buttonText}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              // <textarea
+              //   id="message1"
+              //   rows="24"
+              //   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-black focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              //   placeholder=""
+              //   value={isLoading ? "" : finalResponse}
+              //   readOnly
+              // ></textarea>
             )}
 
             <div className="text-white  focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center absolute bottom-5 right-5">
@@ -507,8 +449,8 @@ export const JobDescription = () => {
       <div className="p-20">
         <div className="font-bold text-2xl">Explore our other services</div>
         <p>
-          Enhance your Hr Productivity: Document, Test, Extend, or Seek Clarifications
-          with Ease
+          Enhance your Hr Productivity: Document, Test, Extend, or Seek
+          Clarifications with Ease
         </p>
       </div>
 
@@ -546,4 +488,4 @@ export const JobDescription = () => {
   );
 };
 
-export default JobDescription;
+export default InterviewAssistant;

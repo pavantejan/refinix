@@ -1,5 +1,5 @@
 const express=require('express');
-const handleCodeOptimizer = require('../Controller/CodeOptimizer.controller');
+const handleCodeOptimizer = require('./../../Controller/Developer_Tools/CodeOptimizer.controller');
 
 const code_optimizer_router=express.Router()
 

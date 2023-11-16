@@ -23,25 +23,22 @@ const HrProductivityTools = () => {
               <div className="px-20 py-14">
                 {/* <div className="font-bold text-center text-xl group-hover:text-white">Refini<span className="group-hover:text-white font-bold text-brandColor">X</span></div> */}
                 <p className="text-lg text-center text-gray-600 font-bold group-hover:text-white">
-                  Job Description Generator
+                  AI Job Description Generator
                 </p>
               </div>
             </div>
           </Link>
 
-          {/* <Link to='/testcasegenerator/chooselanguage'> */}
-          <div className="group max-w-lg rounded overflow-hidden shadow-lg  hover:bg-brandColor">
-            <div className=" py-14">
-              {/* <div className="font-bold text-center text-xl group-hover:text-white">Refini<span className="group-hover:text-white font-bold text-brandColor">X</span></div> */}
-              <p className="text-lg text-center text-gray-600 font-bold group-hover:text-white">
-                Enhanced Interview Assistant
-              </p>
-              <p className="text-sm text-center bg-blue-700 text-white font-bold group-hover:bg-yellow-300 group-hover:text-white">
-                Coming Soon
-              </p>
+          <Link to="/interviewassistant/generator">
+            <div className="group max-w-lg rounded overflow-hidden shadow-lg  hover:bg-brandColor hover:cursor-pointer">
+              <div className="px-20 py-14">
+                {/* <div className="font-bold text-center text-xl group-hover:text-white">Refini<span className="group-hover:text-white font-bold text-brandColor">X</span></div> */}
+                <p className="text-lg text-center text-gray-600 font-bold group-hover:text-white">
+                  Enhanced Interview Assistant
+                </p>
+              </div>
             </div>
-          </div>
-          {/* </Link> */}
+          </Link>
 
           <div className="group  rounded overflow-hidden shadow-lg  hover:bg-brandColor">
             <div className=" py-14">
