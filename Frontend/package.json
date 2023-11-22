@@ -20,6 +20,7 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",
     "react-download-link": "^2.3.0",
+    "react-modal": "^3.16.1",
     "react-router": "^6.15.0",
     "react-router-dom": "^6.15.0",
     "react-shimmer": "^3.2.0",
