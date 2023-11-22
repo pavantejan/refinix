@@ -5,6 +5,7 @@ import Footer from "../../components/Footer";
 import Multiselect from "multiselect-react-dropdown";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Modal from "react-modal";
 
 export const InterviewAssistant = () => {
   // const currentSelectedRequirements;
@@ -25,6 +26,8 @@ export const InterviewAssistant = () => {
   const [selectedBenefits, setSelectedBenefits] = useState([]);
 
   const [inputEnabled, setInputEnabled] = useState(false);
+
+  const [modalIsOpen, setIsOpen] = useState(false);
 
   const [toggles, setToggles] = useState([
     {
@@ -102,6 +105,29 @@ export const InterviewAssistant = () => {
     inputEnabled,
     selectedBenefits,
   ]);
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  const customStyles = {
+    content: {
+      top: "15%",
+      left: "15%",
+      right: "auto",
+      bottom: "auto",
+
+      width: "1100px" /* Adjust this width as needed */,
+      md: "w-full" /* Set width to 100% on medium screens and above */,
+      sm: "w-3/4" /* Set width to 75% on small screens */,
+      xs: "w-1/2",
+      height: "auto",
+      padding: "24px",
+    },
+  };
 
   const generateJobDescription = async (payLoad) => {
     try {
@@ -390,6 +416,44 @@ export const InterviewAssistant = () => {
                     </div>
                   </div>
                 ))}
+                <div className="p-5 flex justify-center items-center">
+                  <button
+                    type="button"
+                    onClick={openModal}
+                    className="px-2.5 pb-2.5 pt-4 rounded-full bg-gray-300 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 text-sm mb-2"
+                  >
+                    <span className="py-2.5">
+                      <svg
+                        class="w-6 h-6 text-gray-800 dark:text-white animate-bounce"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 14"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 1v12m0 0 4-4m-4 4L1 9"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+                  
+                  <div className="">
+                    <Modal
+                      // className="bg-gray-500"
+                      isOpen={modalIsOpen}
+                      // onAfterOpen={afterOpenModal}
+                      // onRequestClose={closeModal}
+                      style={customStyles}
+                      contentLabel="Example Modal"
+                    >
+                      <button onClick={closeModal}>close</button>
+                    </Modal>
+                  </div>
+                </div>
               </div>
 
               // <textarea
@@ -401,37 +465,6 @@ export const InterviewAssistant = () => {
               //   readOnly
               // ></textarea>
             )}
-
-            <div className="text-white  focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center absolute bottom-5 right-5">
-              <div className="flex justify-content-center">
-                {/* <CopyToClipboard text={value}>
-                  <button>
-                    <svg
-                      className="h-8 w-8 text-blue-500"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path stroke="none" d="M0 0h24v24H0z" />
-                      <rect x="8" y="8" width="12" height="12" rx="2" />
-                      <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
-                    </svg>
-                  </button>
-                </CopyToClipboard> */}
-
-                <div className="flex items-center">
-                  {/* <DownloadWithSVG
-                    filename="output.txt"
-                    exportFile={exportFileData}
-                  /> */}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
