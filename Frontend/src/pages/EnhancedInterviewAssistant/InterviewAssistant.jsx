@@ -1,34 +1,33 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { Link } from "react-router-dom";
 import Multiselect from "multiselect-react-dropdown";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Modal from "react-modal";
+import { Modal } from "react-web-modal";
+import closeOutline from "../../assets/close-outline.svg";
 
 export const InterviewAssistant = () => {
-  // const currentSelectedRequirements;
+  const [file, setFile] = useState(null);
 
-  const [title, setTitle] = useState("");
-  const [department, setDepartment] = useState("");
-  const [company, setCompany] = useState("");
-  const [reportTo, setReportTo] = useState("");
-  const [responsibilities, setResponsibilities] = useState("");
-  const [moreRequirements, setMoreRequirements] = useState("");
+  const [InterviewType, setInterviewType] = useState("");
+  const [InterviewStage, setInterviewStage] = useState("");
+  const [Interviewer, setInterviewer] = useState("");
+  const [InterviewLanguage, setInterviewLanguage] = useState("");
+  const [JobDescription, setJobDescription] = useState("");
 
-  const [finalResponse, setFinalResponse] = useState("");
+  const [value, setValue] = useState(0); // no of questions
+
+  // const [isLoading, setIsLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false); // Initialize as loading
 
-  const [selectedDuties, setSelectedDuties] = useState([]);
-  const [selectedQualification, setSelectedQualification] = useState([]);
-  const [selectedRequirement, setSelectedRequirement] = useState([]);
-  const [selectedBenefits, setSelectedBenefits] = useState([]);
+  const [isVisible, setIsVisible] = useState(false); // for modal
 
-  const [inputEnabled, setInputEnabled] = useState(false);
+  const [hidden, setHidden] = useState(false); // To hide the questions colm
 
-  const [modalIsOpen, setIsOpen] = useState(false);
-
+  // data feteched from backend need to be mapped into this format for QnA
   const [toggles, setToggles] = useState([
     {
       question: "Question 1",
@@ -48,7 +47,34 @@ export const InterviewAssistant = () => {
       divId: "toggle3",
       isVisible: false,
     },
+    {
+      question: "Question 1",
+      buttonText: "Toggle 1",
+      divId: "toggle4",
+      isVisible: false,
+    },
+    {
+      question: "Question 1",
+      buttonText: "Toggle 1",
+      divId: "toggle5",
+      isVisible: false,
+    },
+    {
+      question: "Question 1",
+      buttonText: "Toggle 1",
+      divId: "toggle6",
+      isVisible: false,
+    },
   ]);
+
+  const payLoad = {
+    interviewType: InterviewType,
+    interviewStage: InterviewStage,
+    interviewer: Interviewer,
+    interviewLanguage: InterviewLanguage,
+    noOfQuestions: value,
+    jobDescription: JobDescription,
+  };
 
   const handleToggle = (index) => {
     const updatedToggles = [...toggles];
@@ -56,87 +82,57 @@ export const InterviewAssistant = () => {
     setToggles(updatedToggles);
   };
 
-  const payLoad = {
-    title: title,
-    department: department,
-    about_company: company,
-    report: reportTo,
-    duties: selectedDuties,
-    responsibilites: responsibilities,
-    qualification: selectedQualification,
-    requirements: [...selectedRequirement, moreRequirements],
-    benefits: selectedBenefits,
-  };
-
-  const handleClickAdd = () => {
-    if (inputEnabled) {
-      setInputEnabled(false);
-    } else {
-      setInputEnabled(true);
-    }
-  };
-
   const handleSelect1 = (option) => {
-    setSelectedDuties([option]);
+    setInterviewType(option);
   };
 
   const handleSelect2 = (option) => {
-    setSelectedQualification([option]);
+    setInterviewStage(option);
   };
 
   const handleSelect3 = (option) => {
-    setSelectedRequirement([option]);
+    setInterviewer(option);
   };
 
   const handleSelect4 = (option) => {
-    setSelectedBenefits([option]);
+    setInterviewLanguage(option);
   };
 
   useEffect(() => {
-    console.log(selectedDuties + " -- duties");
-    console.log(selectedQualification + " -- qualities");
-    console.log(selectedRequirement + " -- requirement");
-    console.log(inputEnabled + "-- input enabled");
-    console.log(selectedBenefits + "-- benefits");
+    console.log(InterviewType + " -- type");
+    console.log(InterviewStage + " -- stage");
+    console.log(Interviewer + " -- interviewer");
+    console.log(InterviewLanguage + "-- lang");
+    console.log(JobDescription + "-- desc");
+    console.log(value + "-- val");
   }, [
-    selectedDuties,
-    selectedQualification,
-    selectedRequirement,
-    inputEnabled,
-    selectedBenefits,
+    InterviewType,
+    InterviewStage,
+    InterviewLanguage,
+    Interviewer,
+    value,
+    JobDescription,
   ]);
 
-  function closeModal() {
-    setIsOpen(false);
-  }
-  function openModal() {
-    setIsOpen(true);
-  }
+  const generateInterviewQnA = async (payLoad) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("job_description", JobDescription);
 
-  const customStyles = {
-    content: {
-      top: "15%",
-      left: "15%",
-      right: "auto",
-      bottom: "auto",
-
-      width: "1100px" /* Adjust this width as needed */,
-      md: "w-full" /* Set width to 100% on medium screens and above */,
-      sm: "w-3/4" /* Set width to 75% on small screens */,
-      xs: "w-1/2",
-      height: "auto",
-      padding: "24px",
-    },
-  };
-
-  const generateJobDescription = async (payLoad) => {
     try {
       const response = await axios.post(
-        `http://localhost:5000/jobdescription`,
-        payLoad
+        // `http://localhost:5000/interviewAssistant`,
+        `http://localhost:5000/resume-score-checker`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       setIsLoading(false);
-      setFinalResponse(response.data);
+      // setFinalResponse(response.data);
+      console.log(response.data);
 
       toast.success("Generated Successfully!");
     } catch (error) {
@@ -146,12 +142,29 @@ export const InterviewAssistant = () => {
     }
   };
 
-  const handleClick = async (e) => {
+  const handleClickGenerate = async (e) => {
     e.preventDefault();
+    setHidden(true);
+    // setIsLoading(false);
     setIsLoading(true);
+
     console.log(payLoad);
-    await generateJobDescription(payLoad);
+    await generateInterviewQnA(payLoad);
+    // await new Promise(resolve => setTimeout(resolve, 10000));
+    // setIsLoading(false);
   };
+
+  const header = (
+    <div className="flex flex-row relative w-full items-center justify-center pt-5 pb-0">
+      <img
+        onClick={() => setIsVisible(false)}
+        src={closeOutline}
+        alt="Close"
+        className="absolute left-1.5 cursor-pointer transition-transform transform-gpu duration-300 w-8 h-8 hover:rotate-90"
+      />
+      <h1 className="text-center text-lg font-bold">All Q/A</h1>
+    </div>
+  );
 
   const skeletonItems = [];
   for (let i = 0; i < 4; i++) {
@@ -167,10 +180,11 @@ export const InterviewAssistant = () => {
 
       <div className="flex flex-wrap justify-center font-bold gap-20 ">
         <div className="w-full max-w-lg px-4 py-4 mb-4 relative ">
-          <div className="relative pb-3">
+          <div className="relative pb-3 z-10">
             <Multiselect
-              onSelect={handleSelect2}
-              onRemove={handleSelect2}
+              id="interviewType"
+              onSelect={handleSelect1}
+              onRemove={handleSelect1}
               className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               isObject={false}
               onKeyPressFn={function noRefCheck() {}}
@@ -189,60 +203,38 @@ export const InterviewAssistant = () => {
               style={{
                 searchBox: {
                   border: "none",
-                  "border-bottom": "1px solid gray",
-                  // "border-radius": "1px",
+                  borderBottom: "1px solid gray",
+                  borderRadius: "1px",
                 },
               }}
             />
           </div>
 
-          <div className="py-3">
+          <div className="py-3 z-10">
             <Multiselect
+              id="interviewStage"
               onSelect={handleSelect2}
               onRemove={handleSelect2}
-              className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className=" bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               isObject={false}
               onKeyPressFn={function noRefCheck() {}}
               onSearch={function noRefCheck() {}}
               options={[
-                "3+ years of experience in software development",
-                "Object-oriented programming languages (e.g., Java, C++, Python)",
-                "Relational databases(e.g., MySQL, PostgreSQL)",
-                "Cloud computing platforms (e.g., AWS, Azure, GCP)",
+                "Application Review - Initial screening of resumes",
+                "Phone Screening- To assess basic qualifications, communication skills",
+                "First-Round Interview - HR representative, to assess general fit",
+                "First-Round Interview - Technical",
+                "Second-Round Interview - Technical",
+                "Technical/Functional Interview - For roles requiring specific technical skills",
+                "Panel Interview - to assess a candidate's suitability from various perspectives",
               ]}
               selectionLimit={1}
               placeholder="Pick an interview stage"
               style={{
                 searchBox: {
                   border: "none",
-                  "border-bottom": "1px solid gray",
-                  "border-radius": "1px",
-                },
-              }}
-            />
-          </div>
-
-          <div className="py-3">
-            <Multiselect
-              onSelect={handleSelect3}
-              onRemove={handleSelect3}
-              className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              isObject={false}
-              onKeyPressFn={function noRefCheck() {}}
-              onSearch={function noRefCheck() {}}
-              options={[
-                "Excellent problem-solving and analytical skills",
-                "Strong communication and teamwork skills",
-                "Ability to work independently and as a part of a team",
-                "Ability to meet deadlines and work under pressure",
-              ]}
-              selectionLimit={1}
-              placeholder="Who are you having interview with"
-              style={{
-                searchBox: {
-                  border: "none",
-                  "border-bottom": "1px solid gray",
-                  "border-radius": "1px",
+                  borderBottom: "1px solid gray",
+                  borderRadius: "1px",
                 },
               }}
             />
@@ -250,157 +242,177 @@ export const InterviewAssistant = () => {
 
           <div className="py-3">
             <label
-              for="message"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              htmlFor="uploadBtn"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 absolute bottom-5 right-0 -translate-x-1/2 -translate-y-1/2"
+            >
+              Add File
+            </label>
+            <input
+              type="file"
+              id="uploadBtn"
+              className="hidden"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+          </div>
+
+          <div className="py-3">
+            <Multiselect
+              id="interviewer"
+              onSelect={handleSelect3}
+              onRemove={handleSelect3}
+              className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              isObject={false}
+              onKeyPressFn={function noRefCheck() {}}
+              onSearch={function noRefCheck() {}}
+              options={[
+                "Hiring Manager",
+                "HR Representative",
+                "Team Lead",
+                "Cross-Functional Panel",
+                "Department Head",
+                "Executives",
+                "External Consultant",
+              ]}
+              selectionLimit={1}
+              placeholder="Interviewer"
+              style={{
+                searchBox: {
+                  border: "none",
+                  borderBottom: "1px solid gray",
+                  borderRadius: "1px",
+                },
+              }}
+            />
+          </div>
+
+          <div className="py-3 grid grid-cols-2 justify-center items-center gap-3">
+            <Multiselect
+              id="interviewLanguage"
+              onSelect={handleSelect4}
+              onRemove={handleSelect4}
+              className="bg-gray-50 border-0 border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              isObject={false}
+              onKeyPressFn={function noRefCheck() {}}
+              onSearch={function noRefCheck() {}}
+              options={["English", "French", "Hindi", "German"]}
+              selectionLimit={1}
+              placeholder="Interview Language"
+              style={{
+                searchBox: {
+                  border: "none",
+                  borderBottom: "1px solid gray",
+                  borderRadius: "1px",
+                },
+              }}
+            />
+
+            <div className="flex items-center justify-center gap-2 z-0">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={value}
+                  id="floating_about_company"
+                  className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-b border-gray-400 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  placeholder=" "
+                  onChange={() => {
+                    setValue(value);
+                  }}
+                />
+                <label
+                  htmlFor="floating_about_company"
+                  className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+                >
+                  No. Of Questions Required
+                </label>
+              </div>
+
+              <div className="grid grid-rows-2">
+                <button
+                  onClick={() => {
+                    value < 20 ? setValue(value + 1) : value;
+                  }}
+                >
+                  <svg
+                    className="w-4 h-4 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 16 10"
+                  >
+                    <path d="M9.207 1A2 2 0 0 0 6.38 1L.793 6.586A2 2 0 0 0 2.207 10H13.38a2 2 0 0 0 1.414-3.414L9.207 1Z" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={() => {
+                    value > 0 ? setValue(value - 1) : value;
+                  }}
+                >
+                  <svg
+                    className="w-4 h-4 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 16 10"
+                  >
+                    <path d="M15.434 1.235A2 2 0 0 0 13.586 0H2.414A2 2 0 0 0 1 3.414L6.586 9a2 2 0 0 0 2.828 0L15 3.414a2 2 0 0 0 .434-2.179Z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="py-3">
+            {/* <label
+              htmlFor="message"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Paste the job description below
-            </label>
+            </label> */}
             <textarea
               id="message"
               rows="4"
-              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Write your thoughts here..."
+              onChange={(e) => {
+                setJobDescription(e.target.value);
+              }}
+              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Paste your description here..."
             ></textarea>
           </div>
-
-          {/* <div className="pb-5 text-gray-600 font-bold">
-            Availability
-            <div className="font-normal py-3 text-gray-700 dark:text-gray-400">
-              Select date range
-            </div>
-
-
-            <div date-rangepicker className="flex items-center">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                  </svg>
-                </div>
-                <input name="start" type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date start" />
-              </div>
-              <span className="mx-4 text-gray-500">to</span>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                  </svg>
-                </div>
-                <input name="end" type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date end" />
-              </div>
-            </div>
-
-
-          </div> */}
-
-          {/* <div className="gap-72 pt-3 text-center inline-flex text-gray-600 font-bold">
-            Available ASAP
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-500 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-          <div className="text-sm font-normal pt-2 pb-3 text-gray-700 dark:text-gray-400">
-            Available with in next one week
-          </div>
-
-          <div>
-            <label htmlFor="underline_select" className="sr-only">
-              Expertise
-            </label>
-            <select
-              id="underline_select"
-              className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
-            >
-              <option value="">Choose required Expertise</option>
-              <option value="">S</option>
-              <option value="">C</option>
-              <option value="">F</option>
-              <option value="">G</option>
-            </select>
-
-            <label htmlFor="underline_select" className="sr-only">
-              Discipline
-            </label>
-            <select
-              id="underline_select"
-              className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
-            >
-              <option value="">Choose required Discipline</option>
-              <option value="">S</option>
-              <option value="">C</option>
-              <option value="">F</option>
-              <option value="">G</option>
-            </select>
-
-            <label htmlFor="underline_select" className="sr-only">
-              Industry
-            </label>
-            <select
-              id="underline_select"
-              className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
-            >
-              <option value="">Choose required Industry</option>
-              <option value="">S</option>
-              <option value="">C</option>
-              <option value="">F</option>
-              <option value="">G</option>
-            </select>
-          </div> */}
         </div>
-        <div className="relative w-full max-w-lg px-4 py-4 mb-4">
+        <div
+          className={`relative w-full max-w-lg px-4 py-4 mb-4 ${
+            hidden ? "block" : "hidden"
+          }`}
+        >
           <div className="relative">
             {isLoading ? (
-              <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-black focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <div className="p-4 justify-center item-center">
-                  <div className="py-3.5 mb-4 flex items-center gap-5">
-                    <div className="loader">
-                      <div className="loader-inner"></div>
+              <div>
+                {toggles.slice(0, 3).map((toggle, index) => (
+                  <div className="py-2.5" key={index}>
+                    <div className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <div className="pt-1 pb-2.5 flex justify-center items-center gap-5">
+                        Q{index + 1}.{" "}
+                        <div className="skeleton skeleton-text"></div>
+                      </div>
+                      <hr />
+                      <div className="pl-2.5 pt-4">{skeletonItems}</div>
                     </div>
-                    {skeletonItems}
                   </div>
-                  <div className="py-3.5">{skeletonItems}</div>
-                  <div className="py-3.5">{skeletonItems}</div>
-                  <div className="py-3.5">{skeletonItems}</div>
-                  <div className="py-3.5">{skeletonItems}</div>
-                  <div className="py-3.5">{skeletonItems}</div>
-                </div>
+                ))}
               </div>
             ) : (
-              // <div className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-              //   hi Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              //   <br />
-              //   <br />
-              //   <hr />
-              //   <br />
-              //   <button
-              //     type="button"
-              //     class="text-purple-700 bg-purple-300 hover:bg-purple-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-xl text-sm px-5 py-2.5 text-center mb-2 "
-              //   >
-              //     Answer
-              //   </button>
-              //   <div id="toggle" className="px-4 py-2.5">
-              //     <div className="block p-2.5 w-full text-sm text-gray-600 bg-gray-100 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-              //       Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-              //       Quisquam saepe dignissimos, exercitationem ratione sit
-              //       labore, minima amet quod voluptas asperiores dolorem debitis
-              //       itaque ipsa. Deserunt nobis molestias voluptates fuga
-              //       debitis.
-              //     </div>
-              //   </div>
-              // </div>
-
               <div>
-                {toggles.map((toggle, index) => (
+                {toggles.slice(0, 3).map((toggle, index) => (
                   <div className="py-2.5" key={index}>
                     <div className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                       <div className="pt-1 pb-2.5">
                         Q{index + 1}. {toggle.question}
                       </div>
                       <hr />
-                      <div className="p-2.5">
+                      <div className="pl-2.5 pt-4">
                         <button
-                          className="px-3 py-2.5 text-purple-700 bg-purple-300 hover:bg-purple-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-xl text-sm text-center mb-2"
+                          className="px-3 py-2.5 text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-xl text-sm text-center mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                           onClick={() => handleToggle(index)}
                         >
                           Answer
@@ -419,12 +431,12 @@ export const InterviewAssistant = () => {
                 <div className="p-5 flex justify-center items-center">
                   <button
                     type="button"
-                    onClick={openModal}
+                    onClick={() => setIsVisible(true)}
                     className="px-2.5 pb-2.5 pt-4 rounded-full bg-gray-300 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 text-sm mb-2"
                   >
                     <span className="py-2.5">
                       <svg
-                        class="w-6 h-6 text-gray-800 dark:text-white animate-bounce"
+                        className="w-6 h-6 text-gray-800 dark:text-white animate-bounce"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -432,47 +444,72 @@ export const InterviewAssistant = () => {
                       >
                         <path
                           stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M5 1v12m0 0 4-4m-4 4L1 9"
                         />
                       </svg>
                     </span>
                   </button>
-                  
-                  <div className="">
-                    <Modal
-                      // className="bg-gray-500"
-                      isOpen={modalIsOpen}
-                      // onAfterOpen={afterOpenModal}
-                      // onRequestClose={closeModal}
-                      style={customStyles}
-                      contentLabel="Example Modal"
-                    >
-                      <button onClick={closeModal}>close</button>
-                    </Modal>
-                  </div>
+
+                  <Modal
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    header={header}
+                    maxWidth="600px"
+                    maxHeight="80vh"
+                    lockScroll
+                    // onOpen={() => console.log("Modal is open!")}
+                    // onClose={() => console.log("Modal is closed!")}
+                    closeOnBgClick
+                    closeOnEscape
+                    animationDuration={400}
+                    background={"rgba(0,0,0,0.6)"}
+                    modalBackground={"white"}
+                  >
+                    <div className="pr-5">
+                      <div className="w-full items-center justify-center p-5 overflow-x-hidden">
+                        {toggles.map((toggle, index) => (
+                          <div className="py-2.5" key={index}>
+                            <div className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                              <div className="pt-1 pb-2.5">
+                                Q{index + 1}. {toggle.question}
+                              </div>
+                              <hr />
+                              <div className="pl-2.5 pt-4">
+                                <button
+                                  // className="px-3 py-2.5 text-purple-700 bg-purple-300 hover:bg-purple-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-xl text-sm text-center mb-2"
+                                  className="px-3 py-2.5 text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-xl text-sm text-center mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                  onClick={() => handleToggle(index)}
+                                >
+                                  Answer
+                                </button>
+                              </div>
+                              {toggle.isVisible && (
+                                <div id={toggle.divId} className="px-6">
+                                  <div className="block p-2.5 w-full text-sm text-gray-600 bg-gray-100 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    {toggle.buttonText}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Modal>
                 </div>
               </div>
-
-              // <textarea
-              //   id="message1"
-              //   rows="24"
-              //   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-black focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              //   placeholder=""
-              //   value={isLoading ? "" : finalResponse}
-              //   readOnly
-              // ></textarea>
             )}
           </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-center items-center font-bold text-4xl p-10">
+      <div className="flex flex-wrap justify-center items-center font-bold text-4xl pb-5">
         <button
           type="button"
-          onClick={handleClick}
+          onClick={handleClickGenerate}
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-large rounded-xl text-xl px-10 py-4 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
           Generate
@@ -488,17 +525,16 @@ export const InterviewAssistant = () => {
       </div>
 
       <div className="grid grid-cols-2 justify-center gap-20 py-10 px-20">
-        <div className="group max-w-lg rounded overflow-hidden shadow-lg  hover:bg-brandColor ">
-          <div className=" py-14">
-            {/* <div className="font-bold text-center text-xl group-hover:text-white">Refini<span className="group-hover:text-white font-bold text-brandColor">X</span></div> */}
-            <p className="text-lg text-center text-gray-600 font-bold group-hover:text-white">
-              Enhanced Interview Assistant
-            </p>
-            <p className="text-sm text-center bg-blue-700 text-white font-bold group-hover:bg-yellow-300 group-hover:text-white">
-              Coming Soon
-            </p>
+        <Link to="/jobdescription/generator">
+          <div className="group max-w-lg rounded overflow-hidden shadow-lg  hover:bg-brandColor ">
+            <div className=" py-20">
+              {/* <div className="font-bold text-center text-xl group-hover:text-white">Refini<span className="group-hover:text-white font-bold text-brandColor">X</span></div> */}
+              <p className="text-lg text-center text-gray-600 font-bold group-hover:text-white">
+                Job Description Generator
+              </p>
+            </div>
           </div>
-        </div>
+        </Link>
 
         <div className="group max-w-lg rounded overflow-hidden shadow-lg  hover:bg-brandColor ">
           <div className=" py-14">
