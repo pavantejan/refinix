@@ -29,7 +29,8 @@ const HrProductivityTools = () => {
             </div>
           </Link>
 
-          <Link to="/interviewassistant/generator">
+          {/* <Link to="/interviewassistant/generator"> */}
+          <Link to="/interviewassistant/resumeupload">
             <div className="group max-w-lg rounded overflow-hidden shadow-lg  hover:bg-brandColor hover:cursor-pointer">
               <div className="px-20 py-14">
                 {/* <div className="font-bold text-center text-xl group-hover:text-white">Refini<span className="group-hover:text-white font-bold text-brandColor">X</span></div> */}

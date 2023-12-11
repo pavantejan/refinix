@@ -21,6 +21,7 @@ import CodeOptimizerEditor from "./pages/CodeOptimizer/CodeOptimizerEditor";
 import HrProductivityTools from "./pages/HrProductivityTools";
 import JobDescription from "./pages/JobDescriptionGenerator/JobDescription";
 import InterviewAssistant from "./pages/EnhancedInterviewAssistant/InterviewAssistant";
+import ResumeUpload from "./pages/EnhancedInterviewAssistant/ResumeUpload";
 // import {EditorCommentsComposer} from "./pages/CommentsComposer/EditorCommentsComposer";
 
 
@@ -41,6 +42,8 @@ function App() {
 {/* AI Interview Assistant Routes */}
 
 <Route path="/interviewassistant/generator" element = {<InterviewAssistant/>} />
+<Route path="/interviewassistant/resumeupload" element = {<ResumeUpload/>} />
+
 
 
 {/* Code Converter Routes */}
