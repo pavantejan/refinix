@@ -13,17 +13,101 @@ const ResumeUpload = () => {
   const [file, setFile] = useState(null);
   const [JobDescription, setJobDescription] = useState("");
 
-  const [hidden, setHidden] = useState(false); // To hide response data with out any input
+  const [selected, setIsSelected] = useState(false);
+
+  const [click, setClick] = useState(false);
+
+  const [hidden, setHidden] = useState(true); // To hide response data with out any input
   const [color, setColor] = useState(""); // for pie chart color
   const [isLoading, setIsLoading] = useState(false); // Initialize as loading
-  const [finalResponse, setFinalResponse] = useState(""); // response from backend
+  const [finalResponse, setFinalResponse] = useState(""); // response from backend for resume
+  const [skillsResponse, setSkillsResponse] = useState(""); // response from backend for skills
   const [percent, setPercent] = useState(0); // response from backend
+
+  const [skills, setSkills] = useState([]);
+  // const [skills, setSkills] = useState([
+  //   {
+  //     buttonText: "Java",
+  //     divId: "t1",
+  //     isVisible: false,
+  //   },
+  //   {
+  //     buttonText: "Python",
+  //     divId: "t2",
+  //     isVisible: false,
+  //   },
+  //   {
+  //     buttonText: "Angular",
+  //     divId: "t3",
+  //     isVisible: false,
+  //   },
+  //   {
+  //     buttonText: "React",
+  //     divId: "t4",
+  //     isVisible: false,
+  //   },
+  //   {
+  //     buttonText: "Spring-boot",
+  //     divId: "t5",
+  //     isVisible: false,
+  //   },
+  // ]);
+
+  const handleButtonClick = (index) => {
+    const updatedSkills = skills.map((skill, i) => ({
+      ...skill,
+      isVisible: i === index ? !skill.isVisible : false,
+    }));
+    setSkills(updatedSkills);
+    setIsSelected(skills[index].buttonText);
+  };
 
   useEffect(() => {
     console.log(color + " -- color");
-    console.log(finalResponse + " -- response");
+    // console.log(finalResponse + " -- response");
     console.log(percent + " -- percent");
-  }, [color, finalResponse, percent]);
+    console.log(skills + " -- skills");
+  }, [color, finalResponse, percent, skills]);
+
+  const skillsExtract = (response) => {
+    let skillsArray;
+
+    if (Array.isArray(response)) {
+      // If response is an array, use it directly
+      skillsArray = response;
+    } else if (typeof response === 'object' && response !== null) {
+      // If response is an object, extract values as an array
+      skillsArray = Object.values(response);
+    } else {
+      // If response is neither an array nor an object, handle accordingly
+      console.error('Invalid response type:', typeof response);
+      return;
+    }
+
+    const transformedSkills = skillsArray.reduce((accumulator, skill, index) => {
+      const divId = `t${index + 1}`;
+      const trimmedSkill = skill.trim();
+
+      // If the skill contains brackets, treat it as a single entry
+      if (trimmedSkill.includes("(") && trimmedSkill.includes(")")) {
+        return accumulator.concat({
+          buttonText: trimmedSkill,
+          divId,
+          isVisible: false,
+        });
+      }
+
+      // Split by commas and create separate entries
+      const skillsArray = trimmedSkill.split(",").map((individualSkill) => ({
+        buttonText: individualSkill.trim(),
+        divId,
+        isVisible: false,
+      }));
+
+      return accumulator.concat(skillsArray);
+    }, []);
+    setSkills(transformedSkills);
+  };
 
   const getColorForPercentage = (response) => {
     const match = response.match(/(\d+%)/);
@@ -39,14 +123,63 @@ const ResumeUpload = () => {
     setPercent(percentt);
   };
 
-  const resumeMatcher = async () => {
+  //  to generate questions
+  const generateQuestions = async () => {
+    const skill = "java";
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/enhanced-ai-interview-assistant/${skill}`
+      );
+
+      // setIsLoading(false);
+      // setFinalResponse(response.data);
+      console.log(response.data);
+      // getColorForPercentage(response.data);
+
+      toast.success("Generated Successfully!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something Went Wrong");
+      toast.error("Please try again in sometime!");
+    }
+  };
+
+  const skillsGenerator = async () => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("job_description", JobDescription);
 
     try {
       const response = await axios.post(
-        // `http://localhost:5000/interviewAssistant`,
+        `http://localhost:5000/ai-interview-assistant`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setSkillsResponse(response.data);
+      console.log(response.data);
+      skillsExtract(response.data);
+      setHidden(false);
+      toast.success("Skills Generated Successfully!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something Went Wrong in generating skills data");
+      toast.error("Please try again in sometime!");
+    }
+  };
+
+  const resumeMatcher = async () => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("job_description", JobDescription);
+
+    try {
+      console.log("inside the resume matcher");
+      const response = await axios.post(
         `http://localhost:5000/resume-score-checker`,
         formData,
         {
@@ -68,14 +201,22 @@ const ResumeUpload = () => {
     }
   };
 
-  const handleClickGenerate = async (e) => {
+  const handleAnalyseResume = async (e) => {
     e.preventDefault();
-    setHidden(true);
+
     setIsLoading(true);
-    // console.log(payLoad);
     await resumeMatcher();
-    // await new Promise(resolve => setTimeout(resolve, 10000));
-    // setIsLoading(false);
+    await skillsGenerator();
+  };
+
+  const handleSkills = async (e) => {
+    e.preventDefault();
+
+    console.log("inside the handle Skills");
+    setIsLoading(true);
+    await generateQuestions();
+
+    // await skillsGenerator();
   };
 
   const skeletonItems = [];
@@ -91,7 +232,7 @@ const ResumeUpload = () => {
         Resume Analyser
       </div>
 
-      <div className="flex flex-wrap justify-center font-bold gap-40">
+      <div className="flex flex-wrap justify-center font-bold gap-20">
         <div className="w-full max-w-2xl px-4 py-4 mb-4 relative ">
           <textarea
             id="message1"
@@ -150,93 +291,189 @@ const ResumeUpload = () => {
           </div>
         </div>
 
-        <div className="grid grid-row">
-          <div className="flex flex-wrap justify-center items-center font-bold text-4xl pt-10">
+        <div className="flex flex-col items-center justify-center gap-10">
+          <div className="flex flex-wrap justify-center items-center font-bold text-4xl p-10 ">
             <button
               type="button"
-              // onClick={handleClickGenerate}
+              onClick={handleAnalyseResume}
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-xl text-lg px-14 py-4 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             >
               Analyse <br />
               resume
             </button>
-          </div>
-          <div className="flex flex-wrap justify-center items-center font-bold text-4xl pb-10">
+
             <button
               type="button"
-              // onClick={handleClickGenerate}
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-xl text-lg px-12 py-4 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              // disabled={true}
+              onClick={handleSkills}
+              className={`text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-xl text-lg px-12 py-4 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800
+              ${hidden ? "hidden" : "block"}
+          `}
             >
               Generate <br />
               questions
             </button>
           </div>
-        </div>
-        <div
-          className={`relative w-full max-w-lg px-4 py-4 mb-4 
-          ${hidden ? "block" : "hidden"}
+
+          <div
+            className={`
+          ${hidden ? "hidden" : "block"}
           `}
-        >
-          <div className="relative">
-            {isLoading ? (
-              <div>
-                <div className="block py-5 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-black focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <div className="p-4 justify-center item-center">
-                    <div className="py-3.5 mb-4 flex items-center gap-5">
-                      <div className="loader">
-                        <div className="loader-inner"></div>
-                      </div>
-                      {skeletonItems}
-                    </div>
-                    <div className="py-3.5">{skeletonItems}</div>
-                  </div>
-                </div>
-                <div className="p-10">
-                  <div className="mb-4 flex items-center gap-5">
-                    {skeletonItems}
-                  </div>
-                  <div className=" mb-4 flex items-center gap-5">
-                    {skeletonItems}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <textarea
-                  id="message1"
-                  rows="10"
-                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-black focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder=""
-                  value={finalResponse}
-                  readOnly
-                ></textarea>
+          >
+            <div className="p-2.5 rounded-lg border border-gray-500">
+              <p className="py-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                Select One skill to generate questions
+              </p>
 
-                <div className="flex justify-left items-center gap-10 pt-10 h-28">
-                  <div>Profile matching to Job Description :</div>
-                  <div className="grid grid-row-2 w-14">
-                    <Circle
-                      percent={percent}
-                      strokeWidth={20}
-                      steps={{
-                        count: 10,
-                        space: 4,
-                      }}
-                      strokeColor={color}
-                    />
-
-                    <div className="flex justify-center">{percent}%</div>
-                  </div>
-                </div>
+              <hr />
+              <div className="pt-4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 justify-center items-center">
+                {skills.map((skill, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleButtonClick(index)}
+                    className={` text-white hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg border text-sm p-2.5 
+                  ${skill.isVisible ? "bg-gray-800" : "bg-gray-500"}
+                    `}
+                  >
+                    {skill.buttonText}
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="block mx-4 h-auto p-4 w-auto text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        <div className="flex items-center gap-5 bg-gray-500">
-          <div>Resume report</div>
-          <div>Questions</div>
+      <div>
+        <div className="block my-20 mx-10 h-auto p-5 w-auto text-sm bg-gray-100 font-medium text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 relative">
+          <div className="flex gap-60">
+            <div className="p-5">
+              <a
+                href="#"
+                className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              >
+                Resume report
+              </a>
+            </div>
+            <div className="p-5">
+              <a
+                href="#"
+                className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              >
+                Questions
+              </a>
+            </div>
+          </div>
+          <hr />
+
+          {/* <div className="flex h-auto">{skillsResponse}</div> */}
+
+          <div className=" pt-5 relative">
+            <div className="px-20 h-auto ">
+              <div className={`relative w-auto mx-auto py-4 mb-4 `}>
+                <div>
+                  <textarea
+                    id="message1"
+                    rows="18"
+                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-black focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-black dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder=""
+                    value={finalResponse}
+                    readOnly
+                  ></textarea>
+
+                  <div className="flex justify-left items-center gap-10 pt-10 h-28">
+                    <div>Profile matching to Job Description :</div>
+                    <div className="grid grid-row-2 w-14">
+                      <Circle
+                        percent={percent}
+                        strokeWidth={20}
+                        steps={{
+                          count: 10,
+                          space: 4,
+                        }}
+                        strokeColor={color}
+                      />
+
+                      <div className="flex justify-center">{percent}%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="pt-20">
+              <div
+                data-dial-init
+                className="flex flex-col items-end bottom-0 end-24 group absolute z-10"
+              >
+                <div
+                  id="speed-dial-menu-text-inside-button"
+                  className="flex flex-col items-center mb-4 space-y-2"
+                >
+                  <button
+                    type="button"
+                    className="w-[56px] h-[56px] text-gray-500 bg-white rounded-full border border-gray-300 dark:border-gray-600 hover:text-gray-900 shadow-sm dark:hover:text-white dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 focus:outline-none dark:focus:ring-gray-400"
+                  >
+                    <svg
+                      className="w-4 h-4 mx-auto mb-1"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
+                      <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
+                    </svg>
+                    <span className="block mb-px text-xs font-medium">
+                      Save
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="w-[56px] h-[56px] text-gray-500 bg-white rounded-full border border-gray-300 dark:border-gray-600 hover:text-gray-900 shadow-sm dark:hover:text-white dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 focus:outline-none dark:focus:ring-gray-400"
+                  >
+                    <svg
+                      className="w-4 h-4 mx-auto mb-1"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 18 20"
+                    >
+                      <path d="M5 9V4.13a2.96 2.96 0 0 0-1.293.749L.879 7.707A2.96 2.96 0 0 0 .13 9H5Zm11.066-9H9.829a2.98 2.98 0 0 0-2.122.879L7 1.584A.987.987 0 0 0 6.766 2h4.3A3.972 3.972 0 0 1 15 6v10h1.066A1.97 1.97 0 0 0 18 14V2a1.97 1.97 0 0 0-1.934-2Z" />
+                      <path d="M11.066 4H7v5a2 2 0 0 1-2 2H0v7a1.969 1.969 0 0 0 1.933 2h9.133A1.97 1.97 0 0 0 13 18V6a1.97 1.97 0 0 0-1.934-2Z" />
+                    </svg>
+                    <span className="block mb-px text-xs font-medium">
+                      Copy
+                    </span>
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  data-dial-toggle="speed-dial-menu-text-inside-button"
+                  aria-controls="speed-dial-menu-text-inside-button"
+                  aria-expanded="false"
+                  className="flex items-center justify-center text-white bg-blue-700 rounded-full w-14 h-14 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800"
+                >
+                  <svg
+                    className="w-5 h-5 transition-transform group-hover:rotate-45"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 18 18"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 1v16M1 9h16"
+                    />
+                  </svg>
+                  <span className="sr-only">Open actions menu</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
